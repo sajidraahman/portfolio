@@ -44,7 +44,7 @@
     <p class="section-intro">Short-form content has transformed digital marketing. I run a content marketing business that helps creators expand by leveraging short-form content. Here are the results from a few of my clients.</p>
 
     <div class="card-grid two-col">
-      <div class="card">
+      <div class="card clickable" data-client="raisingzion" tabindex="0" role="button" aria-haspopup="dialog">
         <div class="card-top">
           <span class="pill">Active client</span>
         </div>
@@ -55,11 +55,11 @@
         <div class="muted">Since May 2024 · 2 yrs</div>
         <div class="mini-stats">
           <div><strong>130M+</strong><span>views</span></div>
-          <div><strong>370,000+</strong><span>followers</span></div>
+          <div><strong>378,900+</strong><span>followers</span></div>
         </div>
       </div>
 
-      <div class="card">
+      <div class="card clickable" data-client="joebartolozzi" tabindex="0" role="button" aria-haspopup="dialog">
         <div class="card-top">
           <span class="pill">Active client</span>
         </div>
@@ -67,14 +67,14 @@
           <img class="client-avatar" src="assets/joebartolozzi.webp" alt="@joebartolozzi">
           <h3>@joebartolozzi</h3>
         </div>
-        <div class="muted">Since June 2026 · 1 mo</div>
+        <div class="muted">Since August 2026</div>
         <div class="mini-stats">
-          <div><strong>2M+</strong><span>views</span></div>
-          <div><strong>4,000+</strong><span>followers</span></div>
+          <div><strong>15,000+</strong><span>views</span></div>
+          <div><strong>1,000+</strong><span>followers</span></div>
         </div>
       </div>
 
-      <div class="card">
+      <div class="card clickable" data-client="sidemen" tabindex="0" role="button" aria-haspopup="dialog">
         <div class="card-top">
           <span class="pill pill-muted">Previous client</span>
         </div>
@@ -84,12 +84,12 @@
         </div>
         <div class="muted">Sep 2023 – May 2024</div>
         <div class="mini-stats">
-          <div><strong>30M+</strong><span>views</span></div>
+          <div><strong>31.3M+</strong><span>views</span></div>
           <div><strong>40,000+</strong><span>followers</span></div>
         </div>
       </div>
 
-      <div class="card">
+      <div class="card clickable" data-client="georainbolt" tabindex="0" role="button" aria-haspopup="dialog">
         <div class="card-top">
           <span class="pill pill-muted">Previous client</span>
         </div>
@@ -99,11 +99,12 @@
         </div>
         <div class="muted">Jan 2025 – Mar 2025</div>
         <div class="mini-stats">
-          <div><strong>3M+</strong><span>views</span></div>
+          <div><strong>3.5M+</strong><span>views</span></div>
           <div><strong>10,000+</strong><span>followers</span></div>
         </div>
       </div>
     </div>
+    <p class="hint">Tap a client to see more details.</p>
   </section>
 
   <!-- Academics -->
@@ -216,6 +217,34 @@
   </section>
 
 </main>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalHandle">
+    <button class="modal-close" id="modalClose" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg>
+    </button>
+
+    <div class="modal-head">
+      <img class="client-avatar" id="modalAvatar" src="" alt="">
+      <div class="modal-head-text">
+        <h3 id="modalHandle"></h3>
+        <div class="muted" id="modalDuration"></div>
+      </div>
+      <span class="pill" id="modalPill"></span>
+    </div>
+
+    <p id="modalDescription"></p>
+
+    <div class="modal-stats" id="modalStats"></div>
+
+    <div class="modal-highlight" id="modalHighlight" hidden></div>
+
+    <a class="modal-link" id="modalLink" target="_blank" rel="noopener" aria-label="View managed account" hidden>
+      <span id="modalLinkIcon"></span>
+      <span>View account</span>
+    </a>
+  </div>
+</div>
 
 <script src="script.js"></script>
 </body>
