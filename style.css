@@ -199,10 +199,21 @@ h1 {
   outline: none;
 }
 
-.hint {
-  color: var(--muted);
-  font-size: 0.85rem;
-  margin: 1rem 0 0;
+.learn-more-row {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+#what-i-do p {
+  color: var(--fg);
+  margin: 0 0 1.1rem;
+}
+
+#what-i-do p:last-child { margin-bottom: 0; }
+
+#what-i-do p a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .card h3 {

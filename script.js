@@ -107,7 +107,7 @@ const CLIENTS = {
     duration: 'Since May 2024 · 2 yrs',
     description: 'Working with an established TikTok creator with over 5,000,000 followers who pivoted to more family-friendly content — helping grow the account using short-form clips with a consistent posting strategy.',
     stats: [
-      ['378,900+', 'followers'],
+      ['380,000+', 'followers'],
       ['130M+', 'views'],
       ['15.2M+', 'likes'],
       ['500,000+', 'watch hours'],
@@ -124,10 +124,10 @@ const CLIENTS = {
     duration: 'Since August 2026',
     description: 'Working with an established content creator with over 25,000,000 followers on TikTok to expand his YouTube audience and drive more viewership to his alternative channels.',
     stats: [
-      ['1,000+', 'followers'],
-      ['15,000+', 'views'],
-      ['1,000+', 'likes'],
-      ['100+', 'watch hours'],
+      ['2,000+', 'followers'],
+      ['2M+', 'views'],
+      ['400,000+', 'likes'],
+      ['20,000+', 'watch hours'],
     ],
     highlight: null,
     link: 'https://www.tiktok.com/@etherealphi',
