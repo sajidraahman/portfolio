@@ -6,6 +6,10 @@
 <title>Sajid Rahman</title>
 <meta name="description" content="Sajid Rahman — Senior at Stuyvesant High School. Content marketing, academics, leadership, and awards.">
 <link rel="stylesheet" href="style.css">
+<script>
+  // Set before first paint so reveal animations never flash; without JS everything stays visible.
+  document.documentElement.classList.add('js-reveal');
+</script>
 </head>
 <body>
 
@@ -13,16 +17,16 @@
 
   <!-- Hero -->
   <section class="hero">
-    <div class="hero-top">
+    <div class="hero-top reveal">
       <img class="avatar" src="assets/profile.png" alt="Sajid Rahman">
       <h1>Sajid Rahman</h1>
     </div>
 
-    <p class="tagline">Senior at Stuyvesant High School. I help content creators grow through short-form video strategy.</p>
+    <p class="tagline reveal">Senior at Stuyvesant High School. I help content creators grow through short-form video strategy.</p>
 
-    <p class="stat-line"><strong>$20,000+</strong> in revenue from content marketing, and <strong><span id="viewCount"></span></strong> views generated across all platforms.</p>
+    <p class="stat-line reveal"><strong>$20,000+</strong> in revenue from content marketing, and <strong><span id="viewCount"></span></strong> views generated across all platforms.</p>
 
-    <div class="social-row">
+    <div class="social-row reveal">
       <a href="mailto:sajidrahmanedu@gmail.com" aria-label="Email" title="Email">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 6 10 7 10-7"/></svg>
       </a>
@@ -40,11 +44,11 @@
 
   <!-- Work -->
   <section class="section" id="work">
-    <h2>Client Work</h2>
-    <p class="section-intro">Short-form content has transformed digital marketing. I run a content marketing business that helps creators expand by leveraging short-form content. Here are the results from a few of my clients.</p>
+    <h2 class="reveal">Client Work</h2>
+    <p class="section-intro reveal">Short-form content has transformed digital marketing. I run a content marketing business that helps creators expand by leveraging short-form content. Here are the results from a few of my clients.</p>
 
     <div class="card-grid two-col">
-      <div class="card clickable" data-client="raisingzion" tabindex="0" role="button" aria-haspopup="dialog">
+      <div class="card clickable reveal" data-client="raisingzion" tabindex="0" role="button" aria-haspopup="dialog">
         <div class="card-top">
           <span class="pill">Active client</span>
         </div>
@@ -59,7 +63,7 @@
         </div>
       </div>
 
-      <div class="card clickable" data-client="joebartolozzi" tabindex="0" role="button" aria-haspopup="dialog">
+      <div class="card clickable reveal" data-client="joebartolozzi" tabindex="0" role="button" aria-haspopup="dialog">
         <div class="card-top">
           <span class="pill">Active client</span>
         </div>
@@ -69,12 +73,12 @@
         </div>
         <div class="muted">Since August 2026</div>
         <div class="mini-stats">
-          <div><strong>2M+</strong><span>views</span></div>
-          <div><strong>2,000+</strong><span>followers</span></div>
+          <div><strong>50M+</strong><span>views</span></div>
+          <div><strong>50,000+</strong><span>followers</span></div>
         </div>
       </div>
 
-      <div class="card clickable" data-client="sidemen" tabindex="0" role="button" aria-haspopup="dialog">
+      <div class="card clickable reveal" data-client="sidemen" tabindex="0" role="button" aria-haspopup="dialog">
         <div class="card-top">
           <span class="pill pill-muted">Previous client</span>
         </div>
@@ -84,12 +88,12 @@
         </div>
         <div class="muted">Sep 2023 – May 2024</div>
         <div class="mini-stats">
-          <div><strong>31.3M+</strong><span>views</span></div>
+          <div><strong>30M+</strong><span>views</span></div>
           <div><strong>40,000+</strong><span>followers</span></div>
         </div>
       </div>
 
-      <div class="card clickable" data-client="georainbolt" tabindex="0" role="button" aria-haspopup="dialog">
+      <div class="card clickable reveal" data-client="georainbolt" tabindex="0" role="button" aria-haspopup="dialog">
         <div class="card-top">
           <span class="pill pill-muted">Previous client</span>
         </div>
@@ -104,33 +108,33 @@
         </div>
       </div>
     </div>
-    <div class="learn-more-row">
+    <div class="learn-more-row reveal">
       <a class="cta" href="#what-i-do">Learn More</a>
     </div>
   </section>
 
   <!-- What I Do -->
   <section class="section" id="what-i-do">
-    <h2>What I Actually Do</h2>
-    <p>With the rise of short-form content platforms, businesses and creators alike have had to rethink how they reach the public. Whether it's for marketing a product or garnering an audience, it can be overwhelming to manage all the ins and outs of this revolutionizing form of marketing.</p>
-    <p>I edit and manage short-form videos for clients on the top platforms like TikTok and Instagram, handling everything from editing and scheduling all the posts for optimized growth. I handpick my clientele to make sure I can personally adhere to their intended audience.</p>
-    <p>I've built this from nothing. For close to a year, I had no clients and no income, and this period shaped how I structure my work now. I earn through a combination of retainer agreements as well as a share of the ad revenue to make sure I am able to help creators regardless of their financial circumstances.</p>
-    <p>To this date, this approach has helped me grow various accounts for multiple clients to over 400,000 followers and garner over 160,000,000 views. If you would like to learn more about my services, please feel free to <a href="#contact">contact me</a>.</p>
+    <h2 class="reveal">What I Actually Do</h2>
+    <p class="reveal">With the rise of short-form content platforms, businesses and creators alike have had to rethink how they reach the public. Whether it's for marketing a product or garnering an audience, it can be overwhelming to manage all the ins and outs of this revolutionizing form of marketing.</p>
+    <p class="reveal">I edit and manage short-form videos for clients on the top platforms like TikTok and Instagram, handling everything from editing and scheduling all the posts for optimized growth. I handpick my clientele to make sure I can personally adhere to their intended audience.</p>
+    <p class="reveal">I've built this from nothing. For close to a year, I had no clients and no income, and this period shaped how I structure my work now. I earn through a combination of retainer agreements as well as a share of the ad revenue to make sure I am able to help creators regardless of their financial circumstances.</p>
+    <p class="reveal">To this date, this approach has helped me grow various accounts for multiple clients to over 400,000 followers and garner over 160,000,000 views. If you would like to learn more about my services, please feel free to <a href="#contact">contact me</a>.</p>
   </section>
 
   <!-- Academics -->
   <section class="section" id="academics">
-    <h2>Academics</h2>
-    <p class="section-intro">Senior at Stuyvesant High School.</p>
+    <h2 class="reveal">Academics</h2>
+    <p class="section-intro reveal">Senior at Stuyvesant High School.</p>
 
     <div class="card-grid one-col">
-      <div class="card">
+      <div class="card reveal">
         <div class="mini-stats even">
           <div><strong>3.7</strong><span>GPA (Unweighted)</span></div>
-          <div><strong>1490</strong><span>SAT (780 Math · 710 R&amp;W)</span></div>
+          <div><strong>1540</strong><span>SAT (800 Math · 740 R&amp;W)</span></div>
         </div>
       </div>
-      <div class="card">
+      <div class="card reveal">
         <h3>Advanced Coursework</h3>
         <ul class="tag-list">
           <li>AP Environmental Science</li>
@@ -147,10 +151,10 @@
 
   <!-- Leadership -->
   <section class="section" id="leadership">
-    <h2>Leadership &amp; Involvement</h2>
+    <h2 class="reveal">Leadership &amp; Involvement</h2>
 
     <div class="card-grid two-col">
-      <div class="card">
+      <div class="card reveal">
         <h3>Stuyvesant Muslim Students Association</h3>
         <ul class="timeline">
           <li><span class="timeline-date">Sep 2023 – Jun 2025</span><span>Member</span></li>
@@ -159,7 +163,7 @@
         </ul>
       </div>
 
-      <div class="card">
+      <div class="card reveal">
         <h3>Bobby Tariq Tutoring Center</h3>
         <ul class="timeline">
           <li>
@@ -169,8 +173,8 @@
           </li>
           <li>
             <span class="timeline-date">Summer 2026</span>
-            <span>Finance Manager <em>(current)</em></span>
-            <p class="role-desc">Manage finances for a seven-figure tutoring center, including accounting and payment tracking.</p>
+            <span>Head of Marketing <em>(current)</em></span>
+            <p class="role-desc">Spearheaded marketing campaigns utilizing digital platforms, including Facebook Ads, to drive more sales (15% increase in enrollment).</p>
           </li>
         </ul>
       </div>
@@ -179,38 +183,38 @@
 
   <!-- Awards -->
   <section class="section" id="awards">
-    <h2>Awards &amp; Honors</h2>
+    <h2 class="reveal">Awards &amp; Honors</h2>
 
     <ul class="award-list">
-      <li>
+      <li class="reveal">
         <div class="award-main">
           <div class="award-title">MIST Nationals</div>
           <div class="award-year">2026</div>
         </div>
         <div class="award-detail">1st Place, Quiz Bowl</div>
       </li>
-      <li>
+      <li class="reveal">
         <div class="award-main">
           <div class="award-title">MIST Regionals (New York)</div>
           <div class="award-year">2026</div>
         </div>
         <div class="award-detail">1st Place, Quiz Bowl</div>
       </li>
-      <li>
+      <li class="reveal">
         <div class="award-main">
           <div class="award-title">National French Contest (Grand Concours)</div>
           <div class="award-year">2026</div>
         </div>
         <div class="award-detail">14th Place, Bronze Tier</div>
       </li>
-      <li>
+      <li class="reveal">
         <div class="award-main">
           <div class="award-title">MIST Regionals (New York)</div>
           <div class="award-year">2025</div>
         </div>
         <div class="award-detail">3rd Place, Short Film</div>
       </li>
-      <li>
+      <li class="reveal">
         <div class="award-main">
           <div class="award-title">Ithaca College High School Investment Competition</div>
           <div class="award-year">2024–25</div>
@@ -222,9 +226,9 @@
 
   <!-- Contact -->
   <section class="section contact-section" id="contact">
-    <h2 class="center">Get in Touch</h2>
-    <p class="section-intro center">Think you'd benefit from short-form content? Let's talk.</p>
-    <a class="cta" href="mailto:sajidrahmanedu@gmail.com">Contact Me</a>
+    <h2 class="center reveal">Get in Touch</h2>
+    <p class="section-intro center reveal">Think you'd benefit from short-form content? Let's talk.</p>
+    <a class="cta reveal" href="mailto:sajidrahmanedu@gmail.com">Contact Me</a>
   </section>
 
 </main>

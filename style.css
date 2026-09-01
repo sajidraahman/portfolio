@@ -358,6 +358,39 @@ h1 {
 
 .cta:hover { opacity: 0.85; }
 
+/* Scroll reveal
+   Only opacity/transform are animated so the browser can composite on the GPU
+   (no layout or paint work per frame). Elements are unobserved after revealing. */
+html.js-reveal .reveal {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+html.js-reveal .reveal.is-visible {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.65s cubic-bezier(0.22, 0.61, 0.36, 1),
+              transform 0.65s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0s);
+}
+
+/* Gentle stagger for items sharing a parent (cards, awards, paragraphs) */
+html.js-reveal .reveal:nth-child(2) { --reveal-delay: 0.06s; }
+html.js-reveal .reveal:nth-child(3) { --reveal-delay: 0.12s; }
+html.js-reveal .reveal:nth-child(4) { --reveal-delay: 0.18s; }
+html.js-reveal .reveal:nth-child(5) { --reveal-delay: 0.24s; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  html.js-reveal .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  html.js-reveal .reveal.is-visible { transition: none; }
+}
+
 /* Modal */
 .modal-overlay {
   position: fixed;
