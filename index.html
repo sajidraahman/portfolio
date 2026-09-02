@@ -42,6 +42,40 @@
     </div>
   </section>
 
+  <!-- Personal Work -->
+  <section class="section" id="personal-work">
+    <h2 class="reveal">My Personal Work</h2>
+    <p class="section-intro reveal">Outside of client work, I make videos breaking down financial concepts I find genuinely interesting — where my passion for finance meets video editing and production.</p>
+
+    <div class="carousel reveal reveal-fade">
+      <button class="carousel-arrow prev" id="videoPrev" aria-label="Previous video">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+
+      <div class="carousel-track" id="videoTrack">
+        <div class="carousel-slide">
+          <video src="assets/finance1.mp4" muted loop playsinline preload="metadata"></video>
+        </div>
+        <div class="carousel-slide">
+          <video src="assets/finance2.mp4" muted loop playsinline preload="metadata"></video>
+        </div>
+        <div class="carousel-slide">
+          <video src="assets/finance3.mp4" muted loop playsinline preload="metadata"></video>
+        </div>
+      </div>
+
+      <button class="carousel-arrow next" id="videoNext" aria-label="Next video">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+
+    <div class="carousel-dots reveal" id="videoDots">
+      <button class="dot" aria-label="Go to video 1"></button>
+      <button class="dot" aria-label="Go to video 2"></button>
+      <button class="dot" aria-label="Go to video 3"></button>
+    </div>
+  </section>
+
   <!-- Work -->
   <section class="section" id="work">
     <h2 class="reveal">Client Work</h2>
@@ -109,17 +143,8 @@
       </div>
     </div>
     <div class="learn-more-row reveal">
-      <a class="cta" href="#what-i-do">Learn More</a>
+      <button class="cta" id="learnMoreBtn" aria-haspopup="dialog">Learn More</button>
     </div>
-  </section>
-
-  <!-- What I Do -->
-  <section class="section" id="what-i-do">
-    <h2 class="reveal">What I Actually Do</h2>
-    <p class="reveal">With the rise of short-form content platforms, businesses and creators alike have had to rethink how they reach the public. Whether it's for marketing a product or garnering an audience, it can be overwhelming to manage all the ins and outs of this revolutionizing form of marketing.</p>
-    <p class="reveal">I edit and manage short-form videos for clients on the top platforms like TikTok and Instagram, handling everything from editing and scheduling all the posts for optimized growth. I handpick my clientele to make sure I can personally adhere to their intended audience.</p>
-    <p class="reveal">I've built this from nothing. For close to a year, I had no clients and no income, and this period shaped how I structure my work now. I earn through a combination of retainer agreements as well as a share of the ad revenue to make sure I am able to help creators regardless of their financial circumstances.</p>
-    <p class="reveal">To this date, this approach has helped me grow various accounts for multiple clients to over 400,000 followers and garner over 160,000,000 views. If you would like to learn more about my services, please feel free to <a href="#contact">contact me</a>.</p>
   </section>
 
   <!-- Academics -->
@@ -258,6 +283,21 @@
       <span id="modalLinkIcon"></span>
       <span>View account</span>
     </a>
+  </div>
+</div>
+
+<div class="modal-overlay" id="aboutOverlay">
+  <div class="modal modal-wide modal-about" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+    <button class="modal-close" id="aboutClose" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg>
+    </button>
+
+    <h3 id="aboutTitle">What I Actually Do</h3>
+
+    <p>With the rise of short-form content platforms, businesses and creators alike have had to rethink how they reach the public. Whether it's for marketing a product or garnering an audience, it can be overwhelming to manage all the ins and outs of this revolutionizing form of marketing.</p>
+    <p>I edit and manage short-form videos for clients on the top platforms like TikTok and Instagram, handling everything from editing and scheduling all the posts for optimized growth. I handpick my clientele to make sure I can personally adhere to their intended audience.</p>
+    <p>I've built this from nothing. For close to a year, I had no clients and no income, and this period shaped how I structure my work now. I earn through a combination of retainer agreements as well as a share of the ad revenue to make sure I am able to help creators regardless of their financial circumstances.</p>
+    <p>To this date, this approach has helped me grow various accounts for multiple clients to over 400,000 followers and garner over 160,000,000 views. If you would like to learn more about my services, please feel free to <a href="#contact" data-close-modal>contact me</a>.</p>
   </div>
 </div>
 

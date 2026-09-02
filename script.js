@@ -204,7 +204,34 @@ const modalHighlight = document.getElementById('modalHighlight');
 const modalLink = document.getElementById('modalLink');
 const modalLinkIcon = document.getElementById('modalLinkIcon');
 
-let lastFocusedCard = null;
+const aboutOverlay = document.getElementById('aboutOverlay');
+const aboutClose = document.getElementById('aboutClose');
+const learnMoreBtn = document.getElementById('learnMoreBtn');
+
+let lastFocusedEl = null;
+
+// Shared open/close so the client popups and the "What I Actually Do" popup behave identically.
+function openOverlay(overlay, closeBtn) {
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  closeBtn.focus();
+}
+
+function closeOverlay(overlay) {
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+  if (lastFocusedEl) lastFocusedEl.focus();
+}
+
+function wireOverlay(overlay, closeBtn) {
+  closeBtn.addEventListener('click', () => closeOverlay(overlay));
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeOverlay(overlay);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('open')) closeOverlay(overlay);
+  });
+}
 
 function openModal(clientId) {
   const data = CLIENTS[clientId];
@@ -240,35 +267,244 @@ function openModal(clientId) {
     modalLink.hidden = true;
   }
 
-  modalOverlay.classList.add('open');
-  document.body.style.overflow = 'hidden';
-  modalClose.focus();
-}
-
-function closeModal() {
-  modalOverlay.classList.remove('open');
-  document.body.style.overflow = '';
-  if (lastFocusedCard) lastFocusedCard.focus();
+  openOverlay(modalOverlay, modalClose);
 }
 
 document.querySelectorAll('.card.clickable[data-client]').forEach((card) => {
   card.addEventListener('click', () => {
-    lastFocusedCard = card;
+    lastFocusedEl = card;
     openModal(card.dataset.client);
   });
   card.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      lastFocusedCard = card;
+      lastFocusedEl = card;
       openModal(card.dataset.client);
     }
   });
 });
 
-modalClose.addEventListener('click', closeModal);
-modalOverlay.addEventListener('click', (e) => {
-  if (e.target === modalOverlay) closeModal();
+learnMoreBtn.addEventListener('click', () => {
+  lastFocusedEl = learnMoreBtn;
+  openOverlay(aboutOverlay, aboutClose);
 });
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && modalOverlay.classList.contains('open')) closeModal();
+
+// Links inside a popup (e.g. "contact me") should dismiss it before jumping down the page.
+document.querySelectorAll('[data-close-modal]').forEach((link) => {
+  link.addEventListener('click', () => closeOverlay(aboutOverlay));
 });
+
+wireOverlay(modalOverlay, modalClose);
+wireOverlay(aboutOverlay, aboutClose);
+
+// Video carousel — only the centered clip plays, muted, and everything pauses
+// once the section leaves the screen so it isn't decoding video in the background.
+const videoTrack = document.getElementById('videoTrack');
+
+if (videoTrack) {
+  const personalSection = document.getElementById('personal-work');
+  const dots = Array.from(document.querySelectorAll('#videoDots .dot'));
+  const prevBtn = document.getElementById('videoPrev');
+  const nextBtn = document.getElementById('videoNext');
+
+  const realSlides = Array.from(videoTrack.querySelectorAll('.carousel-slide'));
+  const realCount = realSlides.length;
+
+  // Copy the outer clips to either end so there is always another slide in the
+  // direction of travel. Once a copy settles in the middle we silently snap to
+  // its real twin, so the carousel keeps moving forward instead of rewinding.
+  const headCopy = realSlides[0].cloneNode(true);
+  const tailCopy = realSlides[realCount - 1].cloneNode(true);
+  headCopy.classList.remove('is-active');
+  tailCopy.classList.remove('is-active');
+  videoTrack.insertBefore(tailCopy, realSlides[0]);
+  videoTrack.appendChild(headCopy);
+
+  const slides = Array.from(videoTrack.querySelectorAll('.carousel-slide'));
+  const videos = slides.map((slide) => slide.querySelector('video'));
+  videos.forEach((video) => { video.muted = true; });
+
+  // Real clips occupy positions 1..realCount; 0 and the last are the copies.
+  const FIRST_REAL = 1;
+  const LAST_REAL = realCount;
+  const LAST_POSITION = slides.length - 1;
+
+  // Autoplaying video is disorienting with reduced motion on, so those
+  // visitors get normal playback controls instead.
+  const autoplayAllowed = !reducedMotion;
+  if (!autoplayAllowed) videos.forEach((v) => { v.controls = true; });
+
+  let activeIndex = FIRST_REAL;
+
+  const realIndexOf = (pos) => (((pos - FIRST_REAL) % realCount) + realCount) % realCount;
+
+  // Slides are evenly spaced, so one slide's worth of scrolling is constant.
+  // Read live rather than cached so it survives resizes.
+  const stride = () => (slides.length > 1 ? slides[1].offsetLeft - slides[0].offsetLeft : 0);
+
+  // Measured fresh rather than cached from an observer entry: the observer can
+  // deliver several batched records at once, and a stale one would pause playback.
+  function sectionInView() {
+    const rect = personalSection.getBoundingClientRect();
+    return rect.bottom > 0 && rect.top < window.innerHeight;
+  }
+
+  function syncPlayback() {
+    const visible = sectionInView();
+    videos.forEach((video, i) => {
+      if (autoplayAllowed && visible && i === activeIndex) {
+        const played = video.play();
+        // Browsers reject autoplay in some contexts; failing quietly is fine.
+        if (played) played.catch(() => {});
+      } else {
+        video.pause();
+      }
+    });
+  }
+
+  function setActive(index) {
+    activeIndex = index;
+    slides.forEach((slide, i) => slide.classList.toggle('is-active', i === index));
+
+    const real = realIndexOf(index);
+    dots.forEach((dot, i) => dot.classList.toggle('active', i === real));
+    syncPlayback();
+  }
+
+  function goTo(index) {
+    videoTrack.scrollTo({ left: stride() * index, behavior: 'smooth' });
+  }
+
+  // Repositions without animating, for swapping a copy out for its real twin.
+  function jumpTo(index) {
+    videoTrack.style.scrollBehavior = 'auto';
+    videoTrack.scrollLeft = stride() * index;
+    videoTrack.style.scrollBehavior = '';
+  }
+
+  // Hand a copy over to the matching real slide, carrying playback position
+  // across so the seam is invisible.
+  function handOff(targetIndex) {
+    const from = videos[activeIndex];
+    const to = videos[targetIndex];
+
+    if (from && to) {
+      try {
+        to.currentTime = from.currentTime;
+      } catch (err) {
+        /* seeking can throw if metadata isn't ready — starting over is fine */
+      }
+    }
+
+    jumpTo(targetIndex);
+    setActive(targetIndex);
+  }
+
+  function onScrollSettled() {
+    if (activeIndex === 0) handOff(LAST_REAL);
+    else if (activeIndex === LAST_POSITION) handOff(FIRST_REAL);
+  }
+
+  // Advance on its own, but only while the section is actually on screen.
+  const AUTO_ADVANCE_MS = 15000;
+  let autoTimer = null;
+
+  function stopAuto() {
+    clearInterval(autoTimer);
+    autoTimer = null;
+  }
+
+  function startAuto() {
+    stopAuto();
+    if (!autoplayAllowed || !sectionInView()) return;
+    autoTimer = setInterval(() => goTo(activeIndex + 1), AUTO_ADVANCE_MS);
+  }
+
+  // Any manual navigation restarts the countdown so it doesn't jump immediately after.
+  function navigate(index) {
+    goTo(index);
+    startAuto();
+  }
+
+  prevBtn.addEventListener('click', () => navigate(activeIndex - 1));
+  nextBtn.addEventListener('click', () => navigate(activeIndex + 1));
+  dots.forEach((dot, i) => dot.addEventListener('click', () => navigate(i + FIRST_REAL)));
+
+  // Whichever slide sits nearest the middle is the active one. Measuring the
+  // centre beats an IntersectionObserver here, since the blurred neighbours are
+  // partly on screen too and would otherwise register as active.
+  function updateActiveFromScroll() {
+    const trackRect = videoTrack.getBoundingClientRect();
+    const trackCenter = trackRect.left + trackRect.width / 2;
+
+    let nearest = 0;
+    let smallestGap = Infinity;
+
+    slides.forEach((slide, i) => {
+      const rect = slide.getBoundingClientRect();
+      const gap = Math.abs(rect.left + rect.width / 2 - trackCenter);
+      if (gap < smallestGap) {
+        smallestGap = gap;
+        nearest = i;
+      }
+    });
+
+    if (nearest !== activeIndex) setActive(nearest);
+  }
+
+  // Keeps dots and playback in sync with swipes as well as button presses,
+  // throttled to one measurement per frame. The debounce detects when scrolling
+  // has come to rest, which is when a copy can be swapped for its real twin.
+  let scrollFrame = null;
+  let settleTimer = null;
+
+  videoTrack.addEventListener(
+    'scroll',
+    () => {
+      if (!scrollFrame) {
+        scrollFrame = requestAnimationFrame(() => {
+          scrollFrame = null;
+          updateActiveFromScroll();
+        });
+      }
+
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(onScrollSettled, 150);
+    },
+    { passive: true }
+  );
+
+  // Slide spacing changes with the viewport, so re-pin the current slide.
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => jumpTo(activeIndex), 150);
+  });
+
+  const sectionObserver = new IntersectionObserver(
+    () => {
+      syncPlayback();
+      if (sectionInView()) startAuto();
+      else stopAuto();
+    },
+    { threshold: [0, 0.25] }
+  );
+  sectionObserver.observe(personalSection);
+
+  // Browsers pause video when a tab is hidden; pick playback back up on return.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      syncPlayback();
+      startAuto();
+    } else {
+      stopAuto();
+    }
+  });
+
+  // Open on the middle clip so both neighbours are visible straight away.
+  // Setting the scroll position directly also pins the snap container, which
+  // can otherwise settle on the wrong slide while videos are still sizing.
+  const startIndex = FIRST_REAL + Math.floor(realCount / 2);
+  jumpTo(startIndex);
+  setActive(startIndex);
+}

@@ -204,14 +204,21 @@ h1 {
   margin-top: 2rem;
 }
 
-#what-i-do p {
-  color: var(--fg);
-  margin: 0 0 1.1rem;
+.modal-about h3 {
+  margin: 0 0 1.25rem;
+  font-size: 1.35rem;
+  padding-right: 2.5rem;
 }
 
-#what-i-do p:last-child { margin-bottom: 0; }
+.modal-about p {
+  color: var(--fg);
+  font-size: 0.95rem;
+  margin: 0 0 1rem;
+}
 
-#what-i-do p a {
+.modal-about p:last-child { margin-bottom: 0; }
+
+.modal-about a {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -350,13 +357,118 @@ h1 {
   background: var(--fg);
   color: var(--bg);
   text-decoration: none;
+  font-family: inherit;
+  font-size: inherit;
   font-weight: 600;
   padding: 0.85rem 1.75rem;
+  border: none;
   border-radius: 999px;
+  cursor: pointer;
   transition: opacity 0.15s ease;
 }
 
 .cta:hover { opacity: 0.85; }
+
+/* Video carousel
+   Uses native CSS scroll-snap so swipe/momentum on touch devices is handled by
+   the browser rather than JS gesture code. */
+.carousel {
+  /* 9:16 clips — capped by viewport height too so they never overflow short screens */
+  --slide-w: min(300px, 72vw, 42vh);
+  position: relative;
+}
+
+.carousel-track {
+  position: relative;
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* Side padding lets the first and last slide sit centred */
+  padding-inline: calc((100% - var(--slide-w)) / 2);
+}
+
+.carousel-track::-webkit-scrollbar { display: none; }
+
+.carousel-slide {
+  flex: 0 0 var(--slide-w);
+  scroll-snap-align: center;
+}
+
+.carousel-slide video {
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
+  display: block;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  /* Neighbours sit back so the centre clip stays the focus */
+  filter: blur(4px);
+  opacity: 0.4;
+  transform: scale(0.9);
+  transition: filter 0.5s ease, opacity 0.5s ease, transform 0.5s ease;
+}
+
+.carousel-slide.is-active video {
+  filter: none;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.carousel-arrow:hover { background: var(--card-bg); }
+.carousel-arrow:focus-visible { outline: 2px solid var(--muted); outline-offset: 2px; }
+.carousel-arrow svg { width: 18px; height: 18px; }
+
+.carousel-arrow.prev { left: 0; }
+.carousel-arrow.next { right: 0; }
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.carousel-dots .dot {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border-radius: 50%;
+  border: none;
+  background: var(--border);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.carousel-dots .dot.active {
+  background: var(--fg);
+  transform: scale(1.25);
+}
+
+.carousel-dots .dot:focus-visible { outline: 2px solid var(--muted); outline-offset: 3px; }
 
 /* Scroll reveal
    Only opacity/transform are animated so the browser can composite on the GPU
@@ -365,6 +477,10 @@ html.js-reveal .reveal {
   opacity: 0;
   transform: translateY(16px);
 }
+
+/* A transform on a scroll-snap container makes it re-snap mid-animation,
+   so the carousel fades in without moving. */
+html.js-reveal .reveal.reveal-fade { transform: none; }
 
 html.js-reveal .reveal.is-visible {
   opacity: 1;
@@ -382,6 +498,7 @@ html.js-reveal .reveal:nth-child(5) { --reveal-delay: 0.24s; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  .carousel-track { scroll-behavior: auto; }
 
   html.js-reveal .reveal {
     opacity: 1;
@@ -427,6 +544,8 @@ html.js-reveal .reveal:nth-child(5) { --reveal-delay: 0.24s; }
 .modal-overlay.open .modal {
   transform: scale(1) translateY(0);
 }
+
+.modal-wide { max-width: 560px; }
 
 .modal-close {
   position: absolute;
@@ -523,6 +642,22 @@ html.js-reveal .reveal:nth-child(5) { --reveal-delay: 0.24s; }
   }
 
   .stats-row { gap: 2rem; }
+
+  /* Not enough room for side previews on a phone — show one clip cleanly */
+  .carousel-track { padding-inline: 0; }
+
+  .carousel-slide {
+    flex: 0 0 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .carousel-slide video {
+    width: min(300px, 78vw);
+    filter: none;
+    opacity: 1;
+    transform: none;
+  }
 
   .award-list li {
     flex-direction: column;
