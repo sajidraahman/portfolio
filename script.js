@@ -25,6 +25,7 @@ function buildOdometer(container, value) {
     } else {
       const slot = document.createElement('span');
       slot.className = 'odometer-digit';
+
       const strip = document.createElement('span');
       strip.className = 'odometer-strip';
       for (let d = 0; d <= 9; d++) {
@@ -33,7 +34,19 @@ function buildOdometer(container, value) {
         digitEl.textContent = String(d);
         strip.appendChild(digitEl);
       }
-      slot.appendChild(strip);
+
+      const windowEl = document.createElement('span');
+      windowEl.className = 'odometer-window';
+      windowEl.setAttribute('aria-hidden', 'true');
+      windowEl.appendChild(strip);
+
+      // Invisible in-flow digit: sizes the slot and anchors its text baseline.
+      const ghost = document.createElement('span');
+      ghost.className = 'odometer-ghost';
+      ghost.textContent = '0';
+
+      slot.appendChild(windowEl);
+      slot.appendChild(ghost);
       container.appendChild(slot);
       setDigit(slot, Number(ch), false);
     }
@@ -43,7 +56,8 @@ function buildOdometer(container, value) {
 function setDigit(slot, digit, animate) {
   const strip = slot.querySelector('.odometer-strip');
   strip.style.transition = animate ? '' : 'none';
-  strip.style.transform = `translateY(-${digit}lh)`;
+  // Ten equal rows, so each digit is exactly 10% of the strip's height.
+  strip.style.transform = `translateY(-${digit * 10}%)`;
   if (!animate) {
     // force layout so the "no transition" jump is applied before re-enabling transitions
     strip.offsetHeight;
@@ -310,33 +324,34 @@ if (videoTrack) {
   const realSlides = Array.from(videoTrack.querySelectorAll('.carousel-slide'));
   const realCount = realSlides.length;
 
-  // Copy the outer clips to either end so there is always another slide in the
-  // direction of travel. Once a copy settles in the middle we silently snap to
-  // its real twin, so the carousel keeps moving forward instead of rewinding.
-  const headCopy = realSlides[0].cloneNode(true);
-  const tailCopy = realSlides[realCount - 1].cloneNode(true);
-  headCopy.classList.remove('is-active');
-  tailCopy.classList.remove('is-active');
-  videoTrack.insertBefore(tailCopy, realSlides[0]);
-  videoTrack.appendChild(headCopy);
+  // Lay the clips out twice end to end. Because the run repeats every
+  // `realCount` slides, any position has an identical twin one run away, which
+  // lets us shift the track back into the middle without anything changing on
+  // screen. The carousel therefore never has to rest on an outermost slide,
+  // which is what used to leave a blank gap beside it.
+  realSlides.forEach((slide) => {
+    const copy = slide.cloneNode(true);
+    copy.classList.remove('is-active');
+    videoTrack.appendChild(copy);
+  });
 
   const slides = Array.from(videoTrack.querySelectorAll('.carousel-slide'));
   const videos = slides.map((slide) => slide.querySelector('video'));
   videos.forEach((video) => { video.muted = true; });
 
-  // Real clips occupy positions 1..realCount; 0 and the last are the copies.
-  const FIRST_REAL = 1;
-  const LAST_REAL = realCount;
-  const LAST_POSITION = slides.length - 1;
+  // Only slides with a neighbour on both sides may be rested on.
+  const MIN_POSITION = 1;
+  const MAX_POSITION = slides.length - 2;
+  const LOOP = realCount;
 
   // Autoplaying video is disorienting with reduced motion on, so those
   // visitors get normal playback controls instead.
   const autoplayAllowed = !reducedMotion;
   if (!autoplayAllowed) videos.forEach((v) => { v.controls = true; });
 
-  let activeIndex = FIRST_REAL;
+  let activeIndex = MIN_POSITION;
 
-  const realIndexOf = (pos) => (((pos - FIRST_REAL) % realCount) + realCount) % realCount;
+  const realIndexOf = (pos) => ((pos % realCount) + realCount) % realCount;
 
   // Slides are evenly spaced, so one slide's worth of scrolling is constant.
   // Read live rather than cached so it survives resizes.
@@ -375,18 +390,19 @@ if (videoTrack) {
     videoTrack.scrollTo({ left: stride() * index, behavior: 'smooth' });
   }
 
-  // Repositions without animating, for swapping a copy out for its real twin.
+  // Repositions without animating, for shifting between identical twins.
   function jumpTo(index) {
     videoTrack.style.scrollBehavior = 'auto';
     videoTrack.scrollLeft = stride() * index;
     videoTrack.style.scrollBehavior = '';
   }
 
-  // Hand a copy over to the matching real slide, carrying playback position
-  // across so the seam is invisible.
-  function handOff(targetIndex) {
+  // Move to the twin of the current slide one run away. Same clip, same frame,
+  // so nothing changes on screen — it just buys room to keep scrolling.
+  function shiftBy(offset) {
+    const twin = activeIndex + offset;
     const from = videos[activeIndex];
-    const to = videos[targetIndex];
+    const to = videos[twin];
 
     if (from && to) {
       try {
@@ -396,13 +412,15 @@ if (videoTrack) {
       }
     }
 
-    jumpTo(targetIndex);
-    setActive(targetIndex);
+    jumpTo(twin);
+    setActive(twin);
   }
 
-  function onScrollSettled() {
-    if (activeIndex === 0) handOff(LAST_REAL);
-    else if (activeIndex === LAST_POSITION) handOff(FIRST_REAL);
+  // Pull the resting position back between the guard slides. Done before a move
+  // rather than after, so a neighbour is always in place on both sides.
+  function normalize() {
+    while (activeIndex > MAX_POSITION) shiftBy(-LOOP);
+    while (activeIndex < MIN_POSITION) shiftBy(LOOP);
   }
 
   // Advance on its own, but only while the section is actually on screen.
@@ -417,18 +435,42 @@ if (videoTrack) {
   function startAuto() {
     stopAuto();
     if (!autoplayAllowed || !sectionInView()) return;
-    autoTimer = setInterval(() => goTo(activeIndex + 1), AUTO_ADVANCE_MS);
+    autoTimer = setInterval(() => step(1), AUTO_ADVANCE_MS);
   }
 
-  // Any manual navigation restarts the countdown so it doesn't jump immediately after.
-  function navigate(index) {
-    goTo(index);
+  // Shuffle back into range first, then animate a single slide. Since the
+  // reposition happens up front, the visible move is always one clean step with
+  // clips either side of it.
+  function step(direction) {
+    normalize();
+
+    let target = activeIndex + direction;
+    if (target > MAX_POSITION || target < MIN_POSITION) {
+      shiftBy(direction > 0 ? -LOOP : LOOP);
+      target = activeIndex + direction;
+    }
+
+    goTo(target);
     startAuto();
   }
 
-  prevBtn.addEventListener('click', () => navigate(activeIndex - 1));
-  nextBtn.addEventListener('click', () => navigate(activeIndex + 1));
-  dots.forEach((dot, i) => dot.addEventListener('click', () => navigate(i + FIRST_REAL)));
+  // Jump straight to a clip, picking whichever of its twins is closest.
+  function goToReal(realIdx) {
+    normalize();
+
+    let best = null;
+    for (let pos = MIN_POSITION; pos <= MAX_POSITION; pos += 1) {
+      if (realIndexOf(pos) !== realIdx) continue;
+      if (best === null || Math.abs(pos - activeIndex) < Math.abs(best - activeIndex)) best = pos;
+    }
+
+    if (best !== null) goTo(best);
+    startAuto();
+  }
+
+  prevBtn.addEventListener('click', () => step(-1));
+  nextBtn.addEventListener('click', () => step(1));
+  dots.forEach((dot, i) => dot.addEventListener('click', () => goToReal(i)));
 
   // Whichever slide sits nearest the middle is the active one. Measuring the
   // centre beats an IntersectionObserver here, since the blurred neighbours are
@@ -468,8 +510,10 @@ if (videoTrack) {
         });
       }
 
+      // A free swipe can still come to rest on a guard slide; tidy that up once
+      // the scrolling stops so the next move has room on both sides.
       clearTimeout(settleTimer);
-      settleTimer = setTimeout(onScrollSettled, 150);
+      settleTimer = setTimeout(normalize, 150);
     },
     { passive: true }
   );
@@ -501,10 +545,81 @@ if (videoTrack) {
     }
   });
 
-  // Open on the middle clip so both neighbours are visible straight away.
-  // Setting the scroll position directly also pins the snap container, which
-  // can otherwise settle on the wrong slide while videos are still sizing.
-  const startIndex = FIRST_REAL + Math.floor(realCount / 2);
+  // Open on the first clip. Setting the scroll position directly also pins the
+  // snap container, which can otherwise settle on the wrong slide while the
+  // videos are still sizing.
+  let startIndex = 0;
+  while (startIndex < MIN_POSITION) startIndex += LOOP;
+
   jumpTo(startIndex);
   setActive(startIndex);
+}
+
+// Project screenshot carousel — crossfades between stacked images.
+const projectShots = document.getElementById('projectShots');
+
+if (projectShots) {
+  const shotImages = Array.from(projectShots.querySelectorAll('img'));
+  const shotDots = Array.from(document.querySelectorAll('#projectDots .dot'));
+  const shotsPrev = document.getElementById('shotsPrev');
+  const shotsNext = document.getElementById('shotsNext');
+
+  // Slow enough that a screen can actually be read before it changes.
+  const SHOT_INTERVAL_MS = 6000;
+  let shotIndex = 0;
+  let shotTimer = null;
+
+  function showShot(index) {
+    shotIndex = (index + shotImages.length) % shotImages.length;
+    shotImages.forEach((img, i) => img.classList.toggle('is-active', i === shotIndex));
+    shotDots.forEach((dot, i) => dot.classList.toggle('active', i === shotIndex));
+  }
+
+  function stopShots() {
+    clearInterval(shotTimer);
+    shotTimer = null;
+  }
+
+  function startShots() {
+    stopShots();
+    if (reducedMotion) return;
+    shotTimer = setInterval(() => showShot(shotIndex + 1), SHOT_INTERVAL_MS);
+  }
+
+  // Manual navigation restarts the countdown so it doesn't advance right after.
+  function goToShot(index) {
+    showShot(index);
+    startShots();
+  }
+
+  shotsPrev.addEventListener('click', () => goToShot(shotIndex - 1));
+  shotsNext.addEventListener('click', () => goToShot(shotIndex + 1));
+  shotDots.forEach((dot, i) => dot.addEventListener('click', () => goToShot(i)));
+
+  // Hold still while someone is looking closely.
+  projectShots.addEventListener('mouseenter', stopShots);
+  projectShots.addEventListener('mouseleave', startShots);
+
+  // A fade has no native swipe, so a light touch handler covers phones.
+  let touchStartX = null;
+  projectShots.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+  projectShots.addEventListener('touchend', (e) => {
+    if (touchStartX === null) return;
+    const delta = e.changedTouches[0].clientX - touchStartX;
+    touchStartX = null;
+    if (Math.abs(delta) > 40) goToShot(delta < 0 ? shotIndex + 1 : shotIndex - 1);
+  }, { passive: true });
+
+  // Only cycle while on screen.
+  const shotsObserver = new IntersectionObserver(() => {
+    const rect = projectShots.getBoundingClientRect();
+    const onScreen = rect.bottom > 0 && rect.top < window.innerHeight;
+    if (onScreen) startShots();
+    else stopShots();
+  }, { threshold: [0, 0.25] });
+  shotsObserver.observe(projectShots);
+
+  showShot(0);
 }

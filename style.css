@@ -103,40 +103,40 @@ h1 {
 .odometer {
   display: inline-flex;
   align-items: baseline;
-  vertical-align: -0.38em;
+  font-variant-numeric: tabular-nums;
 }
 
+/* Each slot holds an invisible digit in normal flow. That ghost sets the slot's
+   width and, crucially, gives it a real text baseline — an element with
+   overflow:hidden is baselined off its bottom edge instead, which is what threw
+   the number out of line with the sentence around it. */
 .odometer-digit {
-  display: inline-block;
-  height: 1lh;
-  width: 0.62em;
-  overflow: hidden;
   position: relative;
+  display: inline-block;
+}
+
+.odometer-ghost { visibility: hidden; }
+
+/* Clipping happens here rather than on the slot, so it can't affect the baseline. */
+.odometer-window {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
 }
 
 .odometer-strip {
-  display: flex;
-  flex-direction: column;
   position: absolute;
   top: 0;
   left: 0;
+  right: 0;
   transition: transform 0.35s cubic-bezier(0.3, 0.9, 0.3, 1);
 }
 
+/* Plain blocks, so each digit sits on its natural baseline exactly like the
+   ghost behind it. Ten equal rows also let the strip move in tidy 10% steps. */
 .odometer-num {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 1lh;
-}
-
-.odometer-comma {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  align-self: flex-end;
-  height: 1lh;
-  width: 0.3em;
+  display: block;
+  text-align: center;
 }
 
 /* Sections */
@@ -302,6 +302,101 @@ h1 {
   font-size: 0.85rem;
   margin: 0.2rem 0.3rem 0.2rem 0;
 }
+
+/* Progression track — a dot per entry joined by a rail, LinkedIn-style */
+.track-item {
+  position: relative;
+  padding-left: 1.75rem;
+  padding-bottom: 1.5rem;
+}
+
+.track-item:last-child { padding-bottom: 0; }
+
+.track-item::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0.9rem;
+  bottom: 0;
+  width: 1px;
+  background: var(--border);
+}
+
+.track-marker {
+  position: absolute;
+  left: 0;
+  top: 0.45rem;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--fg);
+}
+
+.track-title { font-weight: 600; }
+
+.track-sub {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: 0.1rem;
+}
+
+.track-date {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 0.15rem;
+}
+
+.track-desc {
+  margin: 0.45rem 0 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+/* Project entry — a fuller version of the track item with a screenshot carousel */
+.track-item--project .track-title { font-size: 1.2rem; }
+
+.track-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.track-head .pill { flex-shrink: 0; margin-top: 0.2rem; }
+
+.track-item--project .track-desc {
+  margin-top: 0.85rem;
+  font-size: 0.92rem;
+}
+
+/* Screenshots are stacked and crossfaded rather than scrolled: there is no
+   direction to a fade, so looping from the last back to the first is seamless
+   for free, and only opacity animates. */
+.shots {
+  position: relative;
+  margin-top: 1.25rem;
+  aspect-ratio: 2640 / 1514;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.shots img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.shots img.is-active { opacity: 1; }
+
+.shots .carousel-arrow.prev { left: 0.75rem; }
+.shots .carousel-arrow.next { right: 0.75rem; }
 
 .timeline li {
   padding: 0.6rem 0;
