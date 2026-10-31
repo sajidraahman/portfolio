@@ -1,8 +1,8 @@
 // Live ticking view counter, rendered as a rolling odometer.
 // Anchored to a real timestamp so the count is accurate no matter when the page loads,
 // and keeps climbing in real time rather than resetting on reload.
-const EPOCH_MS = new Date('2026-07-28T00:00:00-04:00').getTime();
-const BASE_VIEWS = 164232500;
+const EPOCH_MS = new Date('2026-10-31T00:00:00-04:00').getTime();
+const BASE_VIEWS = 201800000;
 const DAILY_RATE = 80000;
 const RATE_PER_MS = DAILY_RATE / 86400000;
 
